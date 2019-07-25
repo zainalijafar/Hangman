@@ -1,96 +1,153 @@
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Hangman {
-
-	private Scanner reader; 
-	private FileRead fileRead;
-	private String selectedWord;
 	
+	Scanner reader; 
+	FileReader fileReader;
+	private int trials;
+	private StringBuilder display;
+	Map<Character,List<Integer>> myMap;
+
 	public Hangman() {
-		this.reader = new Scanner(System.in);
+		this.trials = 0;
+		this.myMap = new HashMap<>();
 	}
 	
 	public void start() {
-	
-		userInterface();
-		System.out.println(displayWord());
-		System.out.println("Enter a letter ");
-		String userInput = this.reader.nextLine();
-		char [] charToArray = userInput.toCharArray();
-		char userInputChar = charToArray[0];
-				
-		int index = 0;
 		
-		for(int i=0; i<selectedWord.length(); i++) {
-			
-			
-		}
-	}
-	
-	public void userInterface() {
+		boolean won = true;
+		boolean guessWord = false; 
+		
 		System.out.println("Welcome to Hangman");
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		System.out.println("You have 5 tries to guess the letters");
+		System.out.println("Choose your category : ");
+		System.out.println("[1] Cities of Canada");
+		System.out.println("[2] Cities of USA");
+		
+		this.reader = new Scanner(System.in);
+		
+		String readerString = this.reader.nextLine();
+		
+		int readerChoice = parseStringtoInt(readerString);
+		
+		userChoice(readerChoice);
+		String selectedWord = this.fileReader.selectWord();
+		System.out.println(displayWord(selectedWord));
+		
+		while(this.trials<6) {
+		
+			System.out.println("Enter a letter: ");
+			String userInput = this.reader.nextLine();
+			char userInputChar = userInput.charAt(0);
+			fillLetter(selectedWord,userInputChar);
+			System.out.println(this.display);
+		
+			for(int i=0; i<this.display.length(); i++) {
+			
+				if(this.display.charAt(i) == '*') {
+				won = false;
+				guessWord = false;
+				break;
+				}
+				guessWord = true;
+			}
+			if(guessWord) {
+				System.out.println("You have won the game");
+				break;
+			}
 		}
-		System.out.println("Select the desired Category : ");
-		System.out.println("[1] Cities of Canada ");
-		System.out.println("[2] Cities of USA ");
-		
-		String input = this.reader.nextLine();
-		
-		int selection = parseStringToInt(input);
-		
-		checkInput(selection);
-	}
-	
-	public void checkInput(int i) {
-		
-		if(i==1) {
-			File fileCanada = new File("Canada.txt");
-			this.fileRead = new FileRead(fileCanada);
-		}else if (i==2) {
-			File fileUSA = new File("USA.txt");
-			this.fileRead = new FileRead(fileUSA);
+		if(!won && !guessWord) {
+			System.out.println("You have lost the game ");
 		}
 	}
 	
-	public int parseStringToInt(String input) {
+	public void checkCharacter(String word,char userInput) {
 		
-		int number = Integer.parseInt(input);
-		
-		return number;
-	}
-	
-	public String displayWord() {
-		
-		this.fileRead.readFile();
-		selectedWord = this.fileRead.selectWord();
-		System.out.println(selectedWord);
-		String display = "";
-		
-		for(int i=0; i<selectedWord.length(); i++) {
-			display = display + "_" + " ";
-		}
-		return display;
-	}
-	
-	public List<Integer> findIndex(String word,char letter) {
-		
-		int index = 0;
-		List<Integer> list = new ArrayList<>();
+		boolean wordContained = false;
 		
 		for(int i=0; i<word.length(); i++) {
 			
-			if(word.charAt(i)==letter) {
-				index = i;
-				list.add(index);
+			if(word.charAt(i) != userInput) {
+				continue;
+			}else {
+				System.out.println("Contained");
+				wordContained = true;
+				break;
 			}
 		}
-		return list;
+		if(!wordContained) {
+			System.out.println("Not Contained ");
+		}
+	}
+	
+	public Map<Character,List<Integer>> findIndex(String word,char userInput) {
+		
+		List<Integer> myList = new ArrayList<>();
+		
+		for(int i=0; i<word.length(); i++) {
+			
+			if(word.charAt(i) == userInput) {
+				myList.add(i);
+			}
+			myMap.put(userInput,myList);
+		}
+		return myMap;
+	}
+	
+	public void fillLetter(String word,char userInput) {
+	
+		boolean found = false; 
+		
+		for(int i=0; i<word.length(); i++) {
+			
+			if(word.charAt(i) == userInput && display.charAt(i) == '*') {
+				
+				this.display.setCharAt(i,userInput);
+				found = true; 
+			}
+		}
+		if(!found) {
+			trials++;
+		}
+		System.out.println("You have used : " + trials);
+	}
+	
+	public StringBuilder displayWord(String word) {
+		
+		String display = "";
+		
+		for(int i=0; i<word.length(); i++) {
+			
+			display = display + "*";
+		}
+		this.display = new StringBuilder(display);		
+		return this.display; 
+	}
+	
+	public void userChoice(int i) {
+		
+		if(i==1) {
+			
+			File file = new File("Canada.txt");
+			this.fileReader = new FileReader(file);
+			this.fileReader.readFile();
+			
+		}else if (i==2) {
+			
+			File file = new File("USA.txt");
+			this.fileReader = new FileReader(file);
+			this.fileReader.readFile();
+		}
+	}
+	
+	public int parseStringtoInt(String s) {
+		
+		int number = Integer.parseInt(s);
+		return number;
 	}
 }

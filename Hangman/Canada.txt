@@ -1,4 +1,9 @@
-Montreal
-Toronto
-Ottawa
-Vancouver
+montreal
+toronto
+ottawa
+vancouver
+halifax
+edmonton
+calgary
+winnipeg
+victoria

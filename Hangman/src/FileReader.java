@@ -1,16 +1,15 @@
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 import java.util.Scanner;
+import java.util.*;
 
-public class FileRead {
+public class FileReader {
 
-	public File file;
-	public Scanner reader;
-	public List<String> wordList;
+	File file;
+	Scanner reader;
+	private List <String> wordList;
 	
-	public FileRead(File file) {
+	
+	public FileReader(File file) {
 		this.file = file;
 		this.wordList = new ArrayList<>();
 	}
@@ -18,16 +17,18 @@ public class FileRead {
 	public void readFile() {
 		
 		try {
-			this.reader = new Scanner(this.file);
-			String nextWord = this.reader.nextLine();
 			
-			while(this.reader.hasNextLine()) {
+			this.reader = new Scanner(this.file);
+			String nextWord = null;
+			
+			while(this.reader.hasNext()) {
 				
 				nextWord = this.reader.nextLine();
 				this.wordList.add(nextWord);
 			}
 			
 		}catch(Exception e) {
+			
 			System.out.println("File does not exist");
 		}
 	}
@@ -36,7 +37,6 @@ public class FileRead {
 		
 		Random rand = new Random();
 		int rando = rand.nextInt(this.wordList.size());
-		
 		return this.wordList.get(rando);
 	}
 }

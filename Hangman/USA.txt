@@ -1,3 +1,6 @@
-Washington 
-NewYork City
-Boston
+washington 
+newyork
+boston
+seattle
+miami
+orlando
